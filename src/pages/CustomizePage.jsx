@@ -3,10 +3,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
 import Header from '../components/Header';
 import { getProductById } from '../constants/products';
-import useCustomStore from '../store/useCustomStore';
+import useCustomStore, { getColorPremium } from '../store/useCustomStore';
 import ConfiguratorScene from '../components/configurator/ConfiguratorScene';
 import { PLACEMENT_ZONES } from '../components/configurator/ConfiguratorShirtModel';
-import { saveUserData } from '../../lib/client'; // adjust path if needed
+import { createClient } from '@supabase/supabase-js';
+
+const _supabase = createClient(
+  'https://frjpcjuzsznenvhtqduj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyanBjanV6c3puZW52aHRxZHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5ODQ2OTgsImV4cCI6MjA4OTU2MDY5OH0.1Bcx9a50P6hz2gHBiSEsimoXWuBiSt7-88Df4A1vUnQ'
+);
+async function saveUserData(payload) {
+  const { error } = await _supabase.from('user_data').insert([{ data: payload }]);
+  if (error) { console.error('Supabase Insert Error:', error); return false; }
+  return true;
+}
 import { COLOR_PALETTE, CATEGORIES, DEFAULT_COLOR_ID } from '../components/configurator/configuratorColors';
 import './CustomizePage.css';
 
@@ -70,10 +80,12 @@ export default function CustomizePage() {
   const product = getProductById(id);
   const addToCart = useCustomStore(s => s.addToCart);
   const initProduct = useCustomStore(s => s.initProduct);
+  const selections = useCustomStore(s => s.selections);
+  const setStoreColor = useCustomStore(s => s.setColor);
   const setSize = useCustomStore(s => s.setSize);
-  const currentSize = useCustomStore(s => s.selections?.size);
+  const setSelection = useCustomStore(s => s.setSelection);
 
-  // Configurator state (self-contained — doesn't touch useCustomStore colors)
+  // Configurator state (local UI)
   const [selectedColorId, setSelectedColorId] = useState(DEFAULT_COLOR_ID);
   const [activeCategory, setActiveCategory]   = useState('All');
   const [autoRotate, setAutoRotate]           = useState(false);
@@ -81,6 +93,9 @@ export default function CustomizePage() {
   const [showColorName, setShowColorName]     = useState(false);
   const [activeTab, setActiveTab]             = useState('color');
   const [selectedZoneId, setSelectedZoneId]   = useState(null);
+  
+  // Custom Graphic/Text
+  const [customImageURL, setCustomImageURL]   = useState(null);
   const [logoTexture, setLogoTexture]         = useState(null);
   const nameTimerRef = useRef(null);
 
@@ -94,29 +109,79 @@ export default function CustomizePage() {
     if (product) initProduct(product);
   }, [product, initProduct]);
 
-  // Load logo texture (use product thumbnail as logo)
+  const textValue = selections?.text?.value || '';
+  const textFont  = selections?.text?.font || 'Oswald';
+  const textColor = selections?.text?.color || '#FFFFFF';
+  
+  const bodyColor = selections?.body?.color || '#111111';
+  const colorPrem = getColorPremium(bodyColor);
+  const localTotalPrice = (product?.basePrice || 0) + (textValue.trim() ? 15 : 0) + colorPrem.price;
+
+  // Generate dynamic canvas for Logo + Text
   useEffect(() => {
     if (!product) return;
-    const loader = new THREE.TextureLoader();
-    loader.load(product.photos[0], (tex) => {
-      const image = tex.image;
-      const canvas = document.createElement('canvas');
-      canvas.width = image.width;
-      canvas.height = image.height;
-      const ctx = canvas.getContext('2d');
-      ctx.translate(image.width / 2, image.height / 2);
-      ctx.rotate(Math.PI);
-      ctx.drawImage(image, -image.width / 2, -image.height / 2);
-      const rotatedTex = new THREE.CanvasTexture(canvas);
-      rotatedTex.colorSpace = THREE.SRGBColorSpace;
-      rotatedTex.needsUpdate = true;
-      setLogoTexture(rotatedTex);
-    });
-  }, [product]);
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, 512, 512);
+
+    // Flip context so map applies correctly on the 3D glTF mesh
+    ctx.translate(256, 256);
+    ctx.rotate(Math.PI);
+    ctx.translate(-256, -256);
+
+    const drawText = () => {
+      if (textValue) {
+        ctx.fillStyle = textColor;
+        const cssFont = textFont === 'Inter' ? 'Inter, sans-serif' :
+                        textFont === 'Playfair Display' ? '"Playfair Display", serif' :
+                        textFont === 'Caveat' ? 'Caveat, cursive' : 
+                        textFont === 'Permanent Marker' ? '"Permanent Marker", cursive' :
+                        textFont === 'Righteous' ? '"Righteous", cursive' :
+                        textFont === 'Teko' ? '"Teko", sans-serif' :
+                        '"Oswald", sans-serif';
+        ctx.font = `bold 100px ${cssFont}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const y = customImageURL ? 400 : 256;
+        ctx.fillText(textValue, 256, y);
+      }
+      const finalTex = new THREE.CanvasTexture(canvas);
+      finalTex.colorSpace = THREE.SRGBColorSpace;
+      finalTex.needsUpdate = true;
+      setLogoTexture(finalTex);
+    };
+
+    if (customImageURL) {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = textValue ? 360 : 450;
+        let w = img.width; let h = img.height;
+        const scale = Math.min(maxDim/w, maxDim/h);
+        w *= scale; h *= scale;
+        const y = textValue ? 20 + (360 - h)/2 : (512 - h)/2;
+        ctx.drawImage(img, (512 - w)/2, y, w, h);
+        drawText();
+      };
+      img.src = customImageURL;
+    } else {
+      drawText();
+    }
+  }, [product, customImageURL, textValue, textFont, textColor]);
 
   const handleColorSelect = useCallback((color) => {
     if (color.id === selectedColorId) return;
     setSelectedColorId(color.id);
+    
+    // Wire to store for pricing
+    setStoreColor('body', color.hex);
+    setStoreColor('sleeveLeft', color.hex);
+    setStoreColor('sleeveRight', color.hex);
+
     setShowColorName(true);
     clearTimeout(nameTimerRef.current);
     nameTimerRef.current = setTimeout(() => setShowColorName(false), 2200);
@@ -149,8 +214,10 @@ async function handleAddToCart() {
       selectedColor: selectedColor,
       selectedColorHex: selectedColor?.hex,
       selectedZone: selectedZoneId,
-      size: currentSize,
-      price: product.basePrice
+      size: selections?.size,
+      customImageIncluded: !!customImageURL,
+      customText: textValue,
+      price: localTotalPrice
     }
   }
 
@@ -190,6 +257,16 @@ async function handleAddToCart() {
             <p className="cfg-panel-label">PRODUCT</p>
             <div className="cfg-product-name">{product.shortName}</div>
             <div className="cfg-product-price">${product.basePrice}.00</div>
+            {colorPrem.price > 0 && (
+              <div style={{ color: '#aaa', fontSize: '0.8rem', marginTop: 8 }}>
+                + {colorPrem.label} <span style={{ color: '#ff4d00' }}>+${colorPrem.price}.00</span>
+              </div>
+            )}
+            {textValue.trim() && (
+              <div style={{ color: '#aaa', fontSize: '0.8rem', marginTop: 4 }}>
+                + Custom Text / Graphic <span style={{ color: '#ff4d00' }}>+$15.00</span>
+              </div>
+            )}
           </div>
 
           <div className="cfg-divider" />
@@ -346,6 +423,57 @@ async function handleAddToCart() {
                     ))}
                   </div>
                 </div>
+                <div className="cfg-panel-section" style={{ marginTop: 24, padding: '0 14px' }}>
+                  <p className="cfg-panel-label" style={{ padding: 0 }}>GRAPHIC UPLOAD</p>
+                  <label style={{ display: 'block', background: '#1a1a1a', border: '1px dashed #333', color: '#888', padding: '12px', textAlign: 'center', borderRadius: 4, cursor: 'pointer', fontSize: '0.75rem', marginTop: 8 }}>
+                    {customImageURL ? 'Image Selected (Click to change)' : '+ Choose Image File'}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                           setCustomImageURL(URL.createObjectURL(e.target.files[0]));
+                        }
+                      }} 
+                      style={{ display: 'none' }} 
+                    />
+                  </label>
+                  {customImageURL && (
+                    <button onClick={() => setCustomImageURL(null)} style={{ background: 'none', border: 'none', color: '#ff4d00', fontSize: '0.7rem', marginTop: 8, cursor: 'pointer' }}>Remove Image</button>
+                  )}
+                </div>
+
+                <div className="cfg-panel-section" style={{ marginTop: 24, padding: '0 14px' }}>
+                  <p className="cfg-panel-label" style={{ padding: 0 }}>CUSTOM TEXT</p>
+                  <input 
+                    type="text" 
+                    placeholder="Enter custom text..." 
+                    value={textValue} 
+                    onChange={e => setSelection('text', 'value', e.target.value)}
+                    style={{ width: '100%', padding: '10px', background: '#111', border: '1px solid #333', color: '#fff', marginTop: 8, borderRadius: 4 }}
+                  />
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                    <select 
+                      value={textFont} 
+                      onChange={e => setSelection('text', 'font', e.target.value)}
+                      style={{ flex: 1, padding: '8px', background: '#111', border: '1px solid #333', color: '#888', borderRadius: 4 }}
+                    >
+                      <option value="Oswald">Oswald</option>
+                      <option value="Inter">Inter (Clean)</option>
+                      <option value="Permanent Marker">Marker</option>
+                      <option value="Righteous">Righteous (Bold)</option>
+                      <option value="Teko">Teko (Athletic)</option>
+                      <option value="Playfair Display">Playfair (Serif)</option>
+                      <option value="Caveat">Handwritten</option>
+                    </select>
+                    <input 
+                      type="color" 
+                      value={textColor} 
+                      onChange={e => setSelection('text', 'color', e.target.value)}
+                      style={{ width: 44, height: 36, padding: 0, border: 'none', background: 'none', cursor: 'pointer' }}
+                    />
+                  </div>
+                </div>
               </div>
             )}
 
@@ -372,9 +500,9 @@ async function handleAddToCart() {
                           alignItems: 'center',
                           textAlign: 'left',
                           width: '100%',
-                          background: currentSize === s.id ? 'rgba(200,169,110,0.08)' : 'transparent',
-                          border: `1px solid ${currentSize === s.id ? '#c8a96e' : 'transparent'}`,
-                          color: currentSize === s.id ? '#c8a96e' : '#a0998f',
+                          background: selections?.size === s.id ? 'rgba(200,169,110,0.08)' : 'transparent',
+                          border: `1px solid ${selections?.size === s.id ? '#c8a96e' : 'transparent'}`,
+                          color: selections?.size === s.id ? '#c8a96e' : '#a0998f',
                           padding: '8px',
                           borderRadius: 3,
                           cursor: 'pointer',
@@ -398,7 +526,7 @@ async function handleAddToCart() {
             <div className="cfg-divider" />
             <div className="cfg-panel-section">
               <div className="cfg-price-row">
-                <span className="cfg-price">${product.basePrice}.00</span>
+                <span className="cfg-price">${localTotalPrice}.00</span>
                 <span className="cfg-free-ship">FREE SHIPPING</span>
               </div>
               <button className="cfg-add-btn" onClick={handleAddToCart}>

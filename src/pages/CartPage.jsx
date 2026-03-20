@@ -1,6 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import Header from '../components/Header';
 import useCustomStore from '../store/useCustomStore';
+import { COLOR_PALETTE } from '../components/configurator/configuratorColors';
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -177,6 +178,9 @@ export default function CartPage() {
 function CartItem({ item, onRemove, onQtyChange }) {
   const { product, selections, addOns, total, qty } = item;
 
+  const colorNameRef = COLOR_PALETTE.find(c => c.hex === selections.body.color);
+  const colorName = colorNameRef ? colorNameRef.name : selections.body.color;
+
   return (
     <div className="cart-item-card" style={{
       background: '#111',
@@ -203,7 +207,7 @@ function CartItem({ item, onRemove, onQtyChange }) {
           {product.shortName}
         </h3>
         <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>
-          {selections.body.material === 'full-grain-leather' ? 'Leather' : 'Wool'} · Size {selections.size}
+          {colorName} {selections.body.material === 'full-grain-leather' ? 'Leather' : 'Wool'} · Size {selections.size}
         </p>
 
         {/* Add-ons List */}

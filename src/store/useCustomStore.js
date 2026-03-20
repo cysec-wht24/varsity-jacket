@@ -26,6 +26,22 @@ const defaultSelections = (product) => ({
   size: 'M',
 });
 
+export const getColorPremium = (hex) => {
+  if (!hex || typeof hex !== 'string') return { price: 0, label: '' };
+  const hw = hex.replace('#', '');
+  if (hw.length !== 6) return { price: 5, label: 'Light Color Premium' };
+  const r = parseInt(hw.substring(0, 2), 16);
+  const g = parseInt(hw.substring(2, 4), 16);
+  const b = parseInt(hw.substring(4, 6), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  
+  if (brightness > 128) {
+    return { price: 5, label: 'Light Color Premium' };
+  } else {
+    return { price: 10, label: 'Dark Color Premium' };
+  }
+};
+
 const computeAddOns = (sel, basePrice) => {
   const addOns = [];
 
@@ -33,7 +49,12 @@ const computeAddOns = (sel, basePrice) => {
   if (sel.sleeveLeft.color !== sel.body.color || sel.sleeveRight.color !== sel.body.color) {
     addOns.push({ label: 'Sleeve contrast', price: CONTRAST_SLEEVE_PRICE });
   }
-  // Material upgrades
+  // Material & Color upgrades
+  const bodyColorPrem = getColorPremium(sel.body.color);
+  if (bodyColorPrem.price > 0) {
+    addOns.push({ label: bodyColorPrem.label, price: bodyColorPrem.price });
+  }
+
   const bodyExtra = MATERIAL_PRICES[sel.body.material] || 0;
   if (bodyExtra > 0) addOns.push({ label: `${sel.body.material} body`, price: bodyExtra });
   const sleeveExtra = MATERIAL_PRICES[sel.sleeveLeft.material] || 0;
