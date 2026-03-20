@@ -6,6 +6,7 @@ import { getProductById } from '../constants/products';
 import useCustomStore from '../store/useCustomStore';
 import ConfiguratorScene from '../components/configurator/ConfiguratorScene';
 import { PLACEMENT_ZONES } from '../components/configurator/ConfiguratorShirtModel';
+import { saveUserData } from '../../lib/client'; // adjust path if needed
 import { COLOR_PALETTE, CATEGORIES, DEFAULT_COLOR_ID } from '../components/configurator/configuratorColors';
 import './CustomizePage.css';
 
@@ -138,10 +139,31 @@ export default function CustomizePage() {
     setSelectedZoneId(prev => prev === zone.id ? null : zone.id);
   };
 
-  const handleAddToCart = () => {
-    addToCart();
-    navigate('/cart');
-  };
+async function handleAddToCart() {
+  const payload = {
+    customer_id: crypto.randomUUID(),
+    product: product.shortName,
+    configuration: {
+      color: selectedColor,
+      zone: selectedZoneId,
+      selectedColor: selectedColor,
+      selectedColorHex: selectedColor?.hex,
+      selectedZone: selectedZoneId,
+      size: currentSize,
+      price: product.basePrice
+    }
+  }
+
+  const success = await saveUserData(payload)
+
+  if (success) {
+    console.log("✅ Saved to DB")
+  } else {
+    console.log("❌ Error saving data")
+  }
+  addToCart();
+  navigate('/cart');
+};
 
   const selectedZone = PLACEMENT_ZONES.find(z => z.id === selectedZoneId);
 
