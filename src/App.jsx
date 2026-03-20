@@ -6,6 +6,7 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import CustomizePage from './pages/CustomizePage';
 import RunwayPage from './pages/RunwayPage';
 import CartPage from './pages/CartPage';
+import HelpdeskPage from './pages/HelpdeskPage';
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="/customize/:id"  element={<CustomizePage />} />
         <Route path="/runway"         element={<RunwayPage />} />
         <Route path="/cart"           element={<CartPage />} />
+        <Route path="/helpdesk"       element={<HelpdeskPage />} />
       </Routes>
     </BrowserRouter>
   );

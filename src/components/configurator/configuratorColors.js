@@ -47,4 +47,4 @@ export const COLOR_PALETTE = [
 ];
 
 export const CATEGORIES = ['All', 'Essentials', 'Earth', 'Blues', 'Greens', 'Reds', 'Statement'];
-export const DEFAULT_COLOR_ID = 'jet-black';
+export const DEFAULT_COLOR_ID = 'arctic-white';

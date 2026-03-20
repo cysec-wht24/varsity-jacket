@@ -1,0 +1,77 @@
+.helpdesk-page {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.helpdesk-main {
+  flex: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 120px 20px 60px;
+  width: 100%;
+}
+
+.helpdesk-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: 1rem;
+}
+
+.helpdesk-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+}
+
+.faq-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.faq-heading {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.faq-item h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.faq-item p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.size-table-container {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.size-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.size-table th, .size-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.size-table th {
+  color: var(--text-primary);
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.05em;
+  font-weight: 400;
+}

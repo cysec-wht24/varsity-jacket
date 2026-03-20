@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import ConfiguratorShirtModel from './ConfiguratorShirtModel';
 
@@ -41,7 +41,7 @@ export default function ConfiguratorScene({
     <Canvas
       camera={{ position: [0, 0, 3], fov: 40, near: 0.01, far: 1000 }}
       gl={{ antialias: true, powerPreference: 'default', stencil: false, alpha: false }}
-      dpr={1}
+      dpr={[1, 2]}
       style={{ background: '#0d0b09', width: '100%', height: '100%' }}
     >
       <ambientLight intensity={0.55} color="#f0ece4" />
@@ -57,6 +57,8 @@ export default function ConfiguratorScene({
           selectedZoneId={selectedZoneId}
           logoTexture={logoTexture}
         />
+        <Environment preset="city" />
+        <ContactShadows position={[0, -1.4, 0]} opacity={0.65} scale={10} blur={2.5} far={4} color="#000" />
       </Suspense>
 
       <CameraRig />

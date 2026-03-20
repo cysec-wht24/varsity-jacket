@@ -10,7 +10,6 @@ export default function Header({ variant = 'default' }) {
   const navLinks = [
     { label: 'Collection', to: '/collection' },
     { label: 'Helpdesk',   to: '/helpdesk'   },
-    { label: 'Know Us',    to: '/know-us'     },
   ];
 
   return (
@@ -23,6 +22,7 @@ export default function Header({ variant = 'default' }) {
             key={link.to}
             to={link.to}
             className={`nav-link ${location.pathname === link.to ? 'active' : ''}`}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             {link.label}
           </Link>

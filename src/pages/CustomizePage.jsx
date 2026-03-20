@@ -9,6 +9,19 @@ import { PLACEMENT_ZONES } from '../components/configurator/ConfiguratorShirtMod
 import { COLOR_PALETTE, CATEGORIES, DEFAULT_COLOR_ID } from '../components/configurator/configuratorColors';
 import './CustomizePage.css';
 
+const SIZING_GUIDE = [
+  { id: 'XXS', cm: '81 - 86 cm', in: '32 - 34"' },
+  { id: 'XS',  cm: '86 - 91 cm', in: '34 - 36"' },
+  { id: 'S',   cm: '91 - 96 cm', in: '36 - 38"' },
+  { id: 'M',   cm: '96 - 101 cm', in: '38 - 40"' },
+  { id: 'L',   cm: '101 - 106 cm', in: '40 - 42"' },
+  { id: 'XL',  cm: '106 - 111 cm', in: '42 - 44"' },
+  { id: 'XXL', cm: '111 - 116 cm', in: '44 - 46"' },
+  { id: '3XL', cm: '116 - 121 cm', in: '46 - 48"' },
+  { id: '4XL', cm: '121 - 126 cm', in: '48 - 50"' },
+  { id: '5XL', cm: '126 - 131 cm', in: '50 - 52"' },
+];
+
 /* ── small sub-components ───────────────────────────────── */
 
 function ColorSwatch({ color, isSelected, onClick }) {
@@ -56,6 +69,8 @@ export default function CustomizePage() {
   const product = getProductById(id);
   const addToCart = useCustomStore(s => s.addToCart);
   const initProduct = useCustomStore(s => s.initProduct);
+  const setSize = useCustomStore(s => s.setSize);
+  const currentSize = useCustomStore(s => s.selections?.size);
 
   // Configurator state (self-contained — doesn't touch useCustomStore colors)
   const [selectedColorId, setSelectedColorId] = useState(DEFAULT_COLOR_ID);
@@ -239,6 +254,10 @@ export default function CustomizePage() {
               className={`cfg-tab ${activeTab === 'logo' ? 'cfg-tab--active' : ''}`}
               onClick={() => setActiveTab('logo')}
             >LOGO</button>
+            <button
+              className={`cfg-tab ${activeTab === 'size' ? 'cfg-tab--active' : ''}`}
+              onClick={() => setActiveTab('size')}
+            >SIZE</button>
           </div>
 
           <div className="cfg-panel-scroll">
@@ -302,6 +321,49 @@ export default function CustomizePage() {
                         isSelected={selectedZoneId === zone.id}
                         onClick={handleZoneSelect}
                       />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SIZE TAB */}
+            {activeTab === 'size' && (
+              <div>
+                <div className="cfg-panel-section">
+                  <p className="cfg-panel-label">SELECT SIZE</p>
+                  <p className="cfg-hint" style={{ marginBottom: 12 }}>Chest measurement guide</p>
+                </div>
+                
+                <div style={{ padding: '0 14px 14px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 1fr', padding: '0 8px 6px', fontSize: '0.65rem', color: '#5a5550', textTransform: 'uppercase', letterSpacing: '0.1em', borderBottom: '1px solid #161616', marginBottom: 4 }}>
+                      <span>Size</span><span>CM</span><span>Inches</span>
+                    </div>
+                    {SIZING_GUIDE.map(s => (
+                      <button
+                        key={s.id}
+                        onClick={() => setSize(s.id)}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '40px 1fr 1fr',
+                          alignItems: 'center',
+                          textAlign: 'left',
+                          width: '100%',
+                          background: currentSize === s.id ? 'rgba(200,169,110,0.08)' : 'transparent',
+                          border: `1px solid ${currentSize === s.id ? '#c8a96e' : 'transparent'}`,
+                          color: currentSize === s.id ? '#c8a96e' : '#a0998f',
+                          padding: '8px',
+                          borderRadius: 3,
+                          cursor: 'pointer',
+                          fontSize: '0.75rem',
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        <span style={{ fontWeight: 700 }}>{s.id}</span>
+                        <span>{s.cm}</span>
+                        <span>{s.in}</span>
+                      </button>
                     ))}
                   </div>
                 </div>

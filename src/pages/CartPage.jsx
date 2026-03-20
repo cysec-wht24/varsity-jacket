@@ -114,6 +114,7 @@ export default function CartPage() {
             </div>
 
             <button
+              className="cart-checkout-btn"
               onClick={() => alert('Checkout coming soon!')}
               style={{
                 width: '100%',
@@ -132,6 +133,25 @@ export default function CartPage() {
               CHECKOUT →
             </button>
             <button
+              className="cart-download-btn"
+              onClick={() => window.print()}
+              style={{
+                width: '100%',
+                background: 'transparent',
+                color: '#888',
+                border: '1px solid #2a2a2a',
+                padding: '10px',
+                borderRadius: 4,
+                cursor: 'pointer',
+                fontSize: '0.78rem',
+                letterSpacing: '0.08em',
+                marginBottom: 10,
+              }}
+            >
+              DOWNLOAD BILL (PDF)
+            </button>
+            <button
+              className="cart-continue-btn"
               onClick={() => navigate('/collection')}
               style={{
                 width: '100%',
@@ -158,14 +178,14 @@ function CartItem({ item, onRemove, onQtyChange }) {
   const { product, selections, addOns, total, qty } = item;
 
   return (
-    <div style={{
+    <div className="cart-item-card" style={{
       background: '#111',
       border: '1px solid #1e1e1e',
       borderRadius: 8,
-      padding: '20px',
+      padding: '24px',
       display: 'grid',
-      gridTemplateColumns: '72px 1fr',
-      gap: 16,
+      gridTemplateColumns: '72px 1fr auto',
+      gap: 20,
     }}>
       {/* Color preview swatch */}
       <div style={{
@@ -177,79 +197,44 @@ function CartItem({ item, onRemove, onQtyChange }) {
         flexShrink: 0,
       }} />
 
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 700 }}>{product.shortName}</h3>
-            <p style={{ margin: '2px 0 0', color: '#666', fontSize: '0.78rem', textTransform: 'capitalize' }}>
-              {product.category} · {selections.body.material}
-            </p>
-          </div>
-          <button
-            onClick={onRemove}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#555',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              lineHeight: 1,
-              padding: 4,
-            }}
-            title="Remove"
-          >
-            ×
-          </button>
-        </div>
+      {/* Details */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          {product.shortName}
+        </h3>
+        <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>
+          {selections.body.material === 'full-grain-leather' ? 'Leather' : 'Wool'} · Size {selections.size}
+        </p>
 
-        {/* Add-ons */}
+        {/* Add-ons List */}
         {addOns.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
             {addOns.map((a, i) => (
-              <span key={i} style={{
-                background: '#1a1a1a',
-                border: '1px solid #2a2a2a',
-                color: '#888',
-                fontSize: '0.65rem',
-                padding: '2px 8px',
-                borderRadius: 20,
-                letterSpacing: '0.04em',
-              }}>
-                {a.label} +${a.price}
+              <span key={i} style={{ color: '#aaa', fontSize: '0.75rem', textTransform: 'capitalize' }}>
+                + {a.label} <span style={{ color: '#ff4d00' }}>+${a.price}</span>
               </span>
             ))}
           </div>
         )}
+      </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Qty */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              onClick={() => qty > 1 && onQtyChange(qty - 1)}
-              style={{
-                width: 26, height: 26, borderRadius: 4,
-                background: '#1a1a1a', border: '1px solid #2a2a2a',
-                color: '#aaa', cursor: 'pointer', fontSize: '1rem',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >−</button>
-            <span style={{ fontSize: '0.85rem', minWidth: 20, textAlign: 'center' }}>{qty}</span>
-            <button
-              onClick={() => onQtyChange(qty + 1)}
-              style={{
-                width: 26, height: 26, borderRadius: 4,
-                background: '#1a1a1a', border: '1px solid #2a2a2a',
-                color: '#aaa', cursor: 'pointer', fontSize: '1rem',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >+</button>
-          </div>
-
-          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#c8a05a' }}>
-            ${(total * qty).toFixed(0)}
-          </span>
+      {/* Controls: Qty, Price, Remove */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+        <div className="cart-qty-controls" style={{ display: 'flex', alignItems: 'center', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 4, padding: '4px 8px', gap: 12 }}>
+          <button onClick={() => qty > 1 && onQtyChange(qty - 1)} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', padding: 0 }}>−</button>
+          <span style={{ fontSize: '0.8rem', width: 14, textAlign: 'center' }}>{qty}</span>
+          <button onClick={() => onQtyChange(qty + 1)} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', padding: 0 }}>+</button>
         </div>
+        
+        <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#fff', marginTop: 'auto', marginBottom: 12 }}>
+          ${(total * qty).toFixed(0)}
+        </span>
+
+        <button className="cart-remove-btn" onClick={onRemove} style={{ background: 'none', border: 'none', color: '#777', cursor: 'pointer', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          REMOVE
+        </button>
       </div>
     </div>
   );
 }
+

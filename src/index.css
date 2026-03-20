@@ -200,3 +200,26 @@ select option { background: var(--bg-secondary); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+@media print {
+  .site-header, .site-nav, .cart-remove-btn, .cart-qty-controls, .cart-checkout-btn, .cart-continue-btn, .cart-download-btn, .hero-cta {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  * {
+    color: #000000 !important;
+    border-color: #cccccc !important;
+    background: transparent !important;
+  }
+  .cart-item-card, .cart-summary-card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+  .cfg-swatch-inner, .swatch-inner {
+    border: 1px solid #000 !important;
+  }
+}
