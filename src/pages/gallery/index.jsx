@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../components/Header';
-import { PRODUCTS } from '../constants/products';
-import './GalleryPage.css';
+import Header from '../../components/header';
+import { PRODUCTS } from '../../constants/products';
+import './index.css';
 
 export default function GalleryPage() {
   const [filter, setFilter] = useState('all');

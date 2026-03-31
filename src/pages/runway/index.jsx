@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import useCustomStore from '../store/useCustomStore';
+import Header from '../../components/header';
+import useCustomStore from '../../store/useCustomStore';
 
 export default function RunwayPage() {
   const navigate = useNavigate();

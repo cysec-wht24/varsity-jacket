@@ -16,13 +16,13 @@ export const PLACEMENT_ZONES = [
   },
   {
     id: 'right-chest',
-    label: 'Right Chest',
+    label: 'Right Bottom',
     icon: '◨',
     materialName: 'Material.003',
   },
   {
     id: 'left-sleeve',
-    label: 'Left Sleeve',
+    label: 'Left Bottom',
     icon: '◁',
     materialName: 'Material.002',
   },

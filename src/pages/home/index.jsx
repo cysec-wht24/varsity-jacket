@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
-import Header from '../components/Header';
-import { PRODUCTS } from '../constants/products';
-import './HomePage.css';
+import Header from '../../components/header';
+import { PRODUCTS } from '../../constants/products';
+import './index.css';
 
 function HeroJacket3D() {
   return (

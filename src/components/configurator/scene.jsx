@@ -2,7 +2,7 @@ import { Suspense, useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
-import ConfiguratorShirtModel from './ConfiguratorShirtModel';
+import ConfiguratorShirtModel from './shirtModel';
 
 function CameraRig() {
   const { camera, scene } = useThree();
@@ -68,8 +68,8 @@ export default function ConfiguratorScene({
         enableZoom={true}
         autoRotate={autoRotate}
         autoRotateSpeed={2}
-        minDistance={0.3}
-        maxDistance={20}
+        minDistance={1}
+        maxDistance={2}
         minPolarAngle={Math.PI * 0.05}
         maxPolarAngle={Math.PI * 0.95}
         rotateSpeed={0.65}

@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import useCustomStore from '../store/useCustomStore';
-import './Header.css';
+import useCustomStore from '../../store/useCustomStore';
+import './index.css';
 
 export default function Header({ variant = 'default' }) {
   const cartItems = useCustomStore(s => s.cartItems);

@@ -1,7 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
-import Header from '../components/Header';
-import useCustomStore from '../store/useCustomStore';
-import { COLOR_PALETTE } from '../components/configurator/configuratorColors';
+import Header from '../../components/header';
+import useCustomStore from '../../store/useCustomStore';
+import { COLOR_PALETTE } from '../../components/configurator/colors';
 
 export default function CartPage() {
   const navigate = useNavigate();

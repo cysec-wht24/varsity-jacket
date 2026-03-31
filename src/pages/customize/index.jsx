@@ -1,24 +1,14 @@
 import { useState, useRef, useCallback, useEffect, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
-import Header from '../components/Header';
-import { getProductById } from '../constants/products';
-import useCustomStore, { getColorPremium } from '../store/useCustomStore';
-import ConfiguratorScene from '../components/configurator/ConfiguratorScene';
-import { PLACEMENT_ZONES } from '../components/configurator/ConfiguratorShirtModel';
-import { createClient } from '@supabase/supabase-js';
-
-const _supabase = createClient(
-  'https://frjpcjuzsznenvhtqduj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyanBjanV6c3puZW52aHRxZHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5ODQ2OTgsImV4cCI6MjA4OTU2MDY5OH0.1Bcx9a50P6hz2gHBiSEsimoXWuBiSt7-88Df4A1vUnQ'
-);
-async function saveUserData(payload) {
-  const { error } = await _supabase.from('user_data').insert([{ data: payload }]);
-  if (error) { console.error('Supabase Insert Error:', error); return false; }
-  return true;
-}
-import { COLOR_PALETTE, CATEGORIES, DEFAULT_COLOR_ID } from '../components/configurator/configuratorColors';
-import './CustomizePage.css';
+import Header from '../../components/header';
+import { getProductById } from '../../constants/products';
+import useCustomStore, { getColorPremium } from '../../store/useCustomStore';
+import ConfiguratorScene from '../../components/configurator/scene';
+import { PLACEMENT_ZONES } from '../../components/configurator/shirtModel';
+import { saveUserData } from '../../../lib/client'; 
+import { COLOR_PALETTE, CATEGORIES, DEFAULT_COLOR_ID } from '../../components/configurator/colors';
+import './index.css';
 
 const SIZING_GUIDE = [
   { id: 'XXS', cm: '81 - 86 cm', in: '32 - 34"' },

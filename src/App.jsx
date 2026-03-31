@@ -1,16 +1,16 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './index.css';
-import HomePage from './pages/HomePage';
-import GalleryPage from './pages/GalleryPage';
-import ProductDetailPage from './pages/ProductDetailPage';
-import CustomizePage from './pages/CustomizePage';
-import RunwayPage from './pages/RunwayPage';
-import CartPage from './pages/CartPage';
-import HelpdeskPage from './pages/HelpdeskPage';
+import HomePage from './pages/home';
+import GalleryPage from './pages/gallery';
+import ProductDetailPage from './pages/productDetail';
+import CustomizePage from './pages/customize';
+import RunwayPage from './pages/runway';
+import CartPage from './pages/cart';
+import HelpdeskPage from './pages/helpdesk';
 
 export default function App() {
   return (
-    <BrowserRouter basename="/varsity-jacket/">
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/"               element={<HomePage />} />
         <Route path="/collection"     element={<GalleryPage />} />

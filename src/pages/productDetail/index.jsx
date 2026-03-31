@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import Header from '../components/Header';
-import { getProductById, SIZES } from '../constants/products';
-import useCustomStore from '../store/useCustomStore';
-import './ProductDetailPage.css';
+import Header from '../../components/header';
+import { getProductById, SIZES } from '../../constants/products';
+import useCustomStore from '../../store/useCustomStore';
+import './index.css';
 
 export default function ProductDetailPage() {
   const { id } = useParams();

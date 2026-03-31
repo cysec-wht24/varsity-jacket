@@ -1,5 +1,5 @@
-import Header from '../components/Header';
-import './HelpdeskPage.css';
+import Header from '../../components/header';
+import './index.css';
 
 export default function HelpdeskPage() {
   return (
